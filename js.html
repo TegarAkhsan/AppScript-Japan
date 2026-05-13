@@ -1,0 +1,459 @@
+<script>
+  let currentUser = null;
+  let allArchives = [];
+  let sessionTimer;
+  const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 Minutes
+
+  function showView(viewId) {
+    const sections = ['landingView', 'loginSection', 'adminLayout'];
+    sections.forEach(s => document.getElementById(s).classList.add('hidden'));
+
+    const adminViews = ['uploadView', 'dataView', 'retentionView'];
+    adminViews.forEach(v => document.getElementById(v).classList.add('hidden'));
+
+    if (viewId === 'login') {
+      document.getElementById('loginSection').classList.remove('hidden');
+      stopSessionTimer();
+    } else if (['data', 'upload', 'retention'].includes(viewId)) {
+      document.getElementById('adminLayout').classList.remove('hidden');
+      document.getElementById(viewId + 'View').classList.remove('hidden');
+      
+      document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      const activeMenu = document.getElementById('menu-' + viewId);
+      if (activeMenu) activeMenu.classList.add('active');
+
+      if (viewId === 'data') loadArchives();
+      if (viewId === 'retention') loadRetentionData();
+      
+      startSessionTimer(); // Start/Reset timer when in admin area
+    } else {
+      document.getElementById('landingView').classList.remove('hidden');
+      stopSessionTimer();
+    }
+  }
+
+  // --- Modal Logic ---
+  function showAlert(title, message, type = 'success') {
+    const modal = document.getElementById('customModal');
+    const icon = document.getElementById('modalIcon');
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMessage');
+
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+
+    if (type === 'success') {
+      icon.innerText = '✅';
+      titleEl.style.color = '#10b981';
+    } else if (type === 'error') {
+      icon.innerText = '❌';
+      titleEl.style.color = '#ef4444';
+    } else if (type === 'warning') {
+      icon.innerText = '⚠️';
+      titleEl.style.color = '#f59e0b';
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('customModal').classList.add('hidden');
+    document.getElementById('customModal').style.display = 'none';
+  }
+
+  // --- Session Logic ---
+  function startSessionTimer() {
+    stopSessionTimer();
+    sessionTimer = setTimeout(() => {
+      logout();
+      showAlert('Sesi Berakhir', 'Anda telah inaktif selama lebih dari 30 menit. Silakan login kembali.', 'warning');
+    }, INACTIVITY_LIMIT);
+  }
+
+  function stopSessionTimer() {
+    if (sessionTimer) clearTimeout(sessionTimer);
+  }
+
+  function resetSessionTimer() {
+    if (currentUser) startSessionTimer();
+  }
+
+  // Listeners for inactivity
+  ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, resetSessionTimer, true);
+  });
+
+  function quickLogin() {
+    document.getElementById('username').value = 'admin';
+    document.getElementById('password').value = 'desa123';
+    handleLogin();
+  }
+
+  function handleLogin() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    
+    if (!user || !pass) {
+      showAlert('Input Kosong', 'Silakan isi username dan password!', 'warning');
+      return;
+    }
+
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        toggleLoader(false);
+        if (res.success) {
+          currentUser = res.user;
+          showView('data');
+          showAlert('Berhasil', 'Selamat datang kembali, ' + user + '!', 'success');
+        } else {
+          document.getElementById('loginError').classList.remove('hidden');
+        }
+      })
+      .withFailureHandler(err => {
+        toggleLoader(false);
+        showAlert('Error Login', 'Terjadi kesalahan saat mencoba login: ' + err, 'error');
+      })
+      .checkLogin(user, pass);
+  }
+
+  function logout() {
+    currentUser = null;
+    stopSessionTimer();
+    showView('landing');
+  }
+
+  function submitArchive() {
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileUpload');
+    const file = fileInput.files[0];
+
+    const formData = {
+      nomorSurat: form.nomorSurat.value,
+      judulArsip: form.judulArsip.value,
+      jenisSurat: form.jenisSurat.value,
+      kategoriArsip: form.kategoriArsip.value,
+      tanggalArsip: form.tanggalArsip.value,
+      statusArsip: form.statusArsip.value,
+      masaRetensi: form.masaRetensi.value,
+      keterangan: form.keterangan.value,
+      fileName: file ? file.name : null,
+      fileData: null
+    };
+
+    if (!formData.nomorSurat || !formData.judulArsip) {
+      showAlert('Lengkapi Form', 'Mohon isi Nomor Surat dan Judul!', 'warning');
+      return;
+    }
+
+    toggleLoader(true);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        formData.fileData = e.target.result;
+        sendToServer(formData);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      sendToServer(formData);
+    }
+  }
+
+  function sendToServer(formData) {
+    google.script.run
+      .withSuccessHandler(res => {
+        toggleLoader(false);
+        showAlert('Berhasil', 'Data arsip dan dokumen berhasil disimpan!', 'success');
+        document.getElementById('uploadForm').reset();
+        document.getElementById('fileName').style.display = 'none';
+        showView('data');
+      })
+      .withFailureHandler(err => {
+        toggleLoader(false);
+        showAlert('Gagal Simpan', 'Gagal menyimpan data: ' + err, 'error');
+      })
+      .saveArchive(formData);
+  }
+
+  function loadArchives() {
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(jsonString => {
+        toggleLoader(false);
+        try {
+          const data = JSON.parse(jsonString);
+          console.log('Data received:', data);
+          if (!data || !Array.isArray(data)) {
+            showAlert('Error Data', 'Format data tidak valid.', 'error');
+            return;
+          }
+          allArchives = data;
+          renderTable(data);
+        } catch (e) {
+          showAlert('Error Parse', 'Gagal memproses data: ' + e.message, 'error');
+        }
+      })
+      .withFailureHandler(err => {
+        toggleLoader(false);
+        showAlert('Gagal Memuat', 'Gagal mengambil data arsip: ' + err, 'error');
+      })
+      .getArchives();
+  }
+
+  function loadRetentionData() {
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(jsonString => {
+        toggleLoader(false);
+        try {
+          const data = JSON.parse(jsonString);
+          if (!data || !Array.isArray(data)) return;
+          allArchives = data;
+          renderRetentionList(data);
+        } catch (e) {}
+      })
+      .withFailureHandler(err => {
+        toggleLoader(false);
+        showAlert('Gagal Memuat', 'Gagal mengambil data retensi: ' + err, 'error');
+      })
+      .getArchives();
+  }
+
+  function renderRetentionList(data) {
+    const container = document.getElementById('retentionList');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    let stats = { total: data.length, aktif: 0, inaktif: 0, warning: 0, danger: 0 };
+    const today = new Date();
+
+    data.forEach(item => {
+      // Validasi Tanggal
+      let startDate = new Date(item.tanggal);
+      if (isNaN(startDate.getTime())) {
+        startDate = new Date(); // Fallback
+      }
+      
+      const retentionYears = parseInt(item.masaretensi) || 5;
+      const expireDate = new Date(startDate);
+      expireDate.setFullYear(expireDate.getFullYear() + retentionYears);
+      
+      const diffTime = expireDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      const totalDuration = retentionYears * 365 * 24 * 60 * 60 * 1000;
+      const timePassed = today - new Date(item.tanggal);
+      const progressPercent = Math.min(100, Math.max(0, (timePassed / totalDuration) * 100));
+
+      let statusClass = 'status-aman';
+      let statusLabel = 'Aman';
+      let progressClass = 'progress-safe';
+      
+      if (diffDays <= 0) {
+        statusClass = 'status-danger';
+        statusLabel = 'Kadaluwarsa';
+        progressClass = 'progress-danger';
+        stats.danger++;
+      } else if (diffDays <= 90) {
+        statusClass = 'status-warning';
+        statusLabel = 'Akan Berakhir';
+        progressClass = 'progress-warning';
+        stats.warning++;
+      }
+      
+      if (item.status === 'Aktif') stats.aktif++;
+      else stats.inaktif++;
+
+      const itemHtml = `
+        <div class="retention-item animate-fade">
+          <div class="retention-header">
+            <div>
+              <h4 style="font-size: 1.1rem; color: var(--gray-800);">${item.judul} <span class="badge ${item.status === 'Aktif' ? 'badge-aktif' : 'badge-inaktif'}">${item.status}</span></h4>
+              <p class="retention-meta" style="color: var(--gray-700);">${item.nomorsurat} • ${item.kategori} • ${new Date(item.tanggal).toLocaleDateString()}</p>
+            </div>
+            ${diffDays <= 0 ? 
+              '<button class="badge" style="background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; cursor: pointer;">🗑️ Hapus</button>' : 
+              '<button class="badge" style="background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; cursor: pointer;">Pindahkan</button>'}
+          </div>
+          <div class="retention-details" style="color: var(--gray-700);">
+            <div>Masa Retensi: <strong>${retentionYears} Tahun</strong></div>
+            <div>Status Retensi: <strong class="${statusClass}">${statusLabel}</strong></div>
+            <div>Sisa Waktu: <strong>${diffDays > 0 ? diffDays + ' hari' : Math.abs(diffDays) + ' hari yang lalu'}</strong></div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar ${progressClass}" style="width: ${progressPercent}%"></div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += itemHtml;
+    });
+
+    document.getElementById('statTotal').innerText = stats.total;
+    document.getElementById('statAktif').innerText = stats.aktif;
+    document.getElementById('statInaktif').innerText = stats.inaktif;
+    document.getElementById('statWarning').innerText = stats.warning;
+    document.getElementById('statDanger').innerText = stats.danger;
+
+    const alertBox = document.getElementById('retentionAlert');
+    if (stats.warning > 0 || stats.danger > 0) {
+      alertBox.classList.remove('hidden');
+      document.getElementById('alertText').innerText = `Perhatian! Ada ${stats.warning + stats.danger} arsip yang memerlukan tindakan penyusutan.`;
+    } else {
+      alertBox.classList.add('hidden');
+    }
+  }
+
+  function renderTable(data) {
+    const body = document.getElementById('archiveBody');
+    body.innerHTML = '';
+    
+    data.forEach((item, index) => {
+      const row = `<tr>
+        <td style="text-align: center; opacity: 0.7;">${index + 1}</td>
+        <td><strong>${item.judul}</strong></td>
+        <td>${item.nomorsurat}</td>
+        <td>${item.jenissurat || '-'}</td>
+        <td>${new Date(item.tanggal).toLocaleDateString('en-CA')}</td>
+        <td><span class="badge ${item.status === 'Aktif' ? 'badge-aktif' : 'badge-inaktif'}">${item.status}</span></td>
+        <td>${item.masaretensi} Tahun</td>
+        <td style="text-align: center; white-space: nowrap;">
+          <button class="action-btn btn-view" title="Lihat" onclick="window.open('${item.filelink}', '_blank')"><i class="fas fa-eye"></i></button>
+          <button class="action-btn btn-download" title="Download" onclick="window.open('${item.filelink}', '_blank')"><i class="fas fa-download"></i></button>
+          <button class="action-btn btn-edit" title="Edit" onclick="prepareEdit(${item.rowNumber})"><i class="fas fa-edit"></i></button>
+          <button class="action-btn btn-delete" title="Hapus" onclick="confirmDelete(${item.rowNumber})"><i class="fas fa-trash-alt"></i></button>
+        </td>
+      </tr>`;
+      body.innerHTML += row;
+    });
+
+    document.getElementById('resultCount').innerText = `Menampilkan ${data.length} dari ${allArchives.length} arsip`;
+  }
+
+  function confirmDelete(rowNumber) {
+    if (confirm('Apakah Anda yakin ingin menghapus arsip ini secara permanen?')) {
+      toggleLoader(true);
+      google.script.run
+        .withSuccessHandler(() => {
+          toggleLoader(false);
+          showAlert('Dihapus', 'Data arsip berhasil dihapus.', 'success');
+          loadArchives();
+        })
+        .withFailureHandler(err => {
+          toggleLoader(false);
+          showAlert('Gagal', 'Gagal menghapus data: ' + err, 'error');
+        })
+        .deleteArchive(rowNumber);
+    }
+  }
+
+  function prepareEdit(rowNumber) {
+    const archive = allArchives.find(a => a.rowNumber === rowNumber);
+    if (!archive) return;
+
+    const form = document.getElementById('editForm');
+    form.editRowNumber.value = rowNumber;
+    form.nomorSurat.value = archive.nomorsurat;
+    form.judulArsip.value = archive.judul;
+    form.jenisSurat.value = archive.jenissurat;
+    form.kategoriArsip.value = archive.kategori;
+    form.tanggalArsip.value = archive.tanggal;
+    form.statusArsip.value = archive.status;
+    form.masaRetensi.value = archive.masaretensi;
+    form.keterangan.value = archive.keterangan;
+
+    document.getElementById('editModal').classList.remove('hidden');
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  // Hook form submit (we handle this here because the modal is in index.html)
+  document.addEventListener('DOMContentLoaded', () => {
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+      editForm.onsubmit = function(e) {
+        e.preventDefault();
+        const rowNumber = this.editRowNumber.value;
+        const formData = {
+          nomorSurat: this.nomorSurat.value,
+          judulArsip: this.judulArsip.value,
+          jenisSurat: this.jenisSurat.value,
+          kategoriArsip: this.kategoriArsip.value,
+          tanggalArsip: this.tanggalArsip.value,
+          statusArsip: this.statusArsip.value,
+          masaRetensi: this.masaRetensi.value,
+          keterangan: this.keterangan.value
+        };
+
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(() => {
+            toggleLoader(false);
+            closeEditModal();
+            showAlert('Berhasil', 'Data arsip berhasil diperbarui.', 'success');
+            loadArchives();
+          })
+          .withFailureHandler(err => {
+            toggleLoader(false);
+            showAlert('Gagal Update', 'Gagal memperbarui data: ' + err, 'error');
+          })
+          .updateArchive(rowNumber, formData);
+      };
+    }
+  });
+
+  function filterTable() {
+    const search = document.getElementById('searchArsip').value.toLowerCase();
+    const jenis = document.getElementById('filterJenis').value;
+    const status = document.getElementById('filterStatus').value;
+    
+    const filtered = allArchives.filter(item => {
+      const matchSearch = item.judul.toLowerCase().includes(search) || item.nomorsurat.toLowerCase().includes(search);
+      const matchJenis = jenis === "" || item.jenissurat === jenis;
+      const matchStatus = status === "" || item.status === status;
+      return matchSearch && matchJenis && matchStatus;
+    });
+    
+    renderTable(filtered);
+  }
+
+  function toggleLoader(show) {
+    document.getElementById('loader').classList.toggle('hidden', !show);
+  }
+
+  function updateFileName(input) {
+    const fileNameDisplay = document.getElementById('fileName');
+    if (input.files && input.files[0]) {
+      fileNameDisplay.innerText = "📄 " + input.files[0].name;
+      fileNameDisplay.style.display = 'block';
+    } else {
+      fileNameDisplay.innerText = "";
+      fileNameDisplay.style.display = 'none';
+    }
+  }
+
+  function createDummy() {
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        toggleLoader(false);
+        showAlert('Dummy Berhasil', res.count + ' data dummy berhasil ditambahkan ke Spreadsheet!', 'success');
+        loadArchives();
+      })
+      .withFailureHandler(err => {
+        toggleLoader(false);
+        showAlert('Gagal', 'Terjadi kesalahan: ' + err, 'error');
+      })
+      .generateDummyData();
+  }
+
+  // Initialize
+  window.onload = () => {
+    showView('landing');
+  };
+</script>

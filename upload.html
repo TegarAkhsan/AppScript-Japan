@@ -1,0 +1,93 @@
+<!-- View: Upload Arsip -->
+<div id="uploadView" class="hidden data-container animate-fade">
+  <div style="margin-bottom: 30px;">
+    <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Upload Arsip Baru</h2>
+    <p style="opacity: 0.8; font-size: 0.95rem;">Lengkapi formulir di bawah untuk menambahkan arsip baru ke sistem</p>
+  </div>
+
+  <div class="white-card" style="max-width: 100%; text-align: left; padding: 40px;">
+    <form id="uploadForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Baris 1 -->
+        <div>
+          <label class="form-label required">Nomor Surat</label>
+          <input type="text" name="nomorSurat" placeholder="Contoh: SKD/001/2024" required>
+        </div>
+        <div>
+          <label class="form-label required">Judul Arsip</label>
+          <input type="text" name="judulArsip" placeholder="Masukkan judul arsip" required>
+        </div>
+
+        <!-- Baris 2 -->
+        <div>
+          <label class="form-label required">Jenis Surat</label>
+          <select name="jenisSurat" required>
+            <option value="" disabled selected>Pilih Jenis Surat</option>
+            <option>Surat Keputusan</option>
+            <option>Surat Keterangan</option>
+            <option>Surat Undangan</option>
+            <option>Berita Acara</option>
+            <option>Surat Pengantar</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label required">Kategori Arsip</label>
+          <select name="kategoriArsip" required>
+            <option value="" disabled selected>Pilih Kategori Arsip</option>
+            <option>Jual Beli Warisan</option>
+            <option>Surat Pernyataan Warisan</option>
+            <option>Sertifikat Tanah</option>
+            <option>Foto Kegiatan</option>
+            <option>Peraturan Desa</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+
+        <!-- Baris 3 -->
+        <div>
+          <label class="form-label required">Tanggal Arsip</label>
+          <input type="date" name="tanggalArsip" required>
+        </div>
+        <div>
+          <label class="form-label required">Status Arsip</label>
+          <select name="statusArsip" required>
+            <option value="Aktif">Aktif</option>
+            <option value="Inaktif">Inaktif</option>
+          </select>
+        </div>
+
+        <!-- Baris 4 (Full Width in Grid) -->
+        <div>
+          <label class="form-label">Masa Retensi Arsip (Tahun)</label>
+          <input type="number" name="masaRetensi" placeholder="Contoh: 5" value="5">
+        </div>
+        
+        <!-- Placeholder for symmetry or future use -->
+        <div></div>
+
+        <div style="grid-column: span 2;">
+          <label class="form-label">Keterangan</label>
+          <textarea name="keterangan" rows="3" placeholder="Masukkan keterangan tambahan (opsional)"></textarea>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div style="margin-top: 30px;">
+        <label class="form-label required">File Dokumen</label>
+        <div class="upload-zone" onclick="document.getElementById('fileUpload').click()" style="background: var(--gray-50); border: 2px dashed var(--gray-200);">
+          <div style="font-size: 3rem; margin-bottom: 10px;">📄</div>
+          <p style="font-weight: 600; color: var(--gray-800); margin-bottom: 5px;">Klik atau seret file ke sini</p>
+          <p style="font-size: 0.85rem; color: var(--gray-700); opacity: 0.7;">Format: PDF, DOC, DOCX (Max 10MB)</p>
+          <input type="file" id="fileUpload" class="hidden" onchange="updateFileName(this)">
+          <div id="fileName" style="margin-top: 15px; display: none; background: #e0fcf9; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-1); color: var(--dark-teal); font-weight: 600;"></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="margin-top: 40px; display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid var(--gray-100); padding-top: 30px;">
+        <button type="reset" class="btn-reset" style="margin: 0; background: var(--gray-100); color: var(--gray-700);">Batalkan</button>
+        <button type="button" class="btn-primary" onclick="submitArchive()" style="width: auto; padding: 12px 40px; margin: 0;">Simpan Arsip</button>
+      </div>
+    </form>
+  </div>
+</div>

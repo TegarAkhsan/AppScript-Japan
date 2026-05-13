@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?!= include('css'); ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- 1. Landing Page View -->
+    <div id="landingView">
+      <nav class="landing-nav">
+        <div class="nav-brand">
+          <img src="https://lh3.googleusercontent.com/d/1-KpB5D-HsWmN2gPY0Io4WlfS2PMe85bC" class="logo-img" alt="Logo">
+          <span>DESA JAPAN</span>
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <button class="btn-primary" onclick="showView('login')" style="width: auto; margin: 0; padding: 10px 30px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white;">Login Admin</button>
+        </div>
+      </nav>
+      <?!= include('dashboard'); ?>
+    </div>
+
+    <!-- 2. Login View -->
+    <div id="loginSection" class="hidden">
+       <?!= include('login'); ?>
+    </div>
+
+    <!-- 3. Admin Sidebar Layout -->
+    <div id="adminLayout" class="hidden">
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <img src="https://lh3.googleusercontent.com/d/1-KpB5D-HsWmN2gPY0Io4WlfS2PMe85bC" class="logo-img" alt="Logo" style="height: 35px;">
+          <span>ADMIN PANEL</span>
+        </div>
+        <nav class="sidebar-menu">
+          <a class="sidebar-item" id="menu-data" onclick="showView('data')"><i class="fas fa-database"></i> Data Arsip</a>
+          <a class="sidebar-item" id="menu-upload" onclick="showView('upload')"><i class="fas fa-file-upload"></i> Upload Arsip</a>
+          <a class="sidebar-item" id="menu-retention" onclick="showView('retention')"><i class="fas fa-hourglass-half"></i> Penyusutan</a>
+          <button onclick="createDummy()" style="margin: 20px 10px; padding: 10px; width: calc(100% - 20px); font-size: 0.8rem; background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); color: white; cursor: pointer; border-radius: 8px;">
+            <i class="fas fa-tools" style="margin-right: 8px;"></i> Generate Dummy
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <a class="sidebar-item" onclick="logout()" style="color: #ffffff; background: #ef4444; margin: 10px; border-radius: 8px; justify-content: center; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+            <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Keluar Sesi
+          </a>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <?!= include('data_arsip'); ?>
+        <?!= include('upload'); ?>
+        <?!= include('retention'); ?>
+      </main>
+    </div>
+
+    <!-- Custom Notification Modal -->
+    <div id="customModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 99999;">
+      <div class="white-card animate-fade" style="width: 100%; max-width: 450px; text-align: center; padding: 40px; position: relative;">
+        <div id="modalIcon" style="font-size: 3.5rem; margin-bottom: 20px;">✅</div>
+        <h3 id="modalTitle" style="font-size: 1.5rem; margin-bottom: 10px; color: var(--gray-800);">Berhasil!</h3>
+        <p id="modalMessage" style="color: var(--gray-700); line-height: 1.6; margin-bottom: 30px;">Data Anda telah berhasil diproses oleh sistem.</p>
+        <button class="btn-primary" onclick="closeModal()" style="width: auto; padding: 12px 50px; margin: 0;">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Edit Archive Modal -->
+    <div id="editModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+      <div class="white-card animate-fade" style="width: 100%; max-width: 700px; padding: 40px; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 20px; font-size: 1.5rem; color: var(--primary);">Edit Arsip</h3>
+        <form id="editForm">
+          <input type="hidden" name="editRowNumber" id="editRowNumber">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>NOMOR SURAT</label>
+              <input type="text" name="nomorSurat" required>
+            </div>
+            <div class="form-group">
+              <label>JUDUL ARSIP</label>
+              <input type="text" name="judulArsip" required>
+            </div>
+            <div class="form-group">
+              <label>JENIS SURAT</label>
+              <select name="jenisSurat" required>
+                <option value="Surat Keputusan">Surat Keputusan</option>
+                <option value="Surat Keterangan">Surat Keterangan</option>
+                <option value="Surat Undangan">Surat Undangan</option>
+                <option value="Berita Acara">Berita Acara</option>
+                <option value="Surat Pengantar">Surat Pengantar</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>KATEGORI ARSIP</label>
+              <select name="kategoriArsip" required>
+                <option value="Jual Beli Warisan">Jual Beli Warisan</option>
+                <option value="Surat Pernyataan Warisan">Surat Pernyataan Warisan</option>
+                <option value="Sertifikat Tanah">Sertifikat Tanah</option>
+                <option value="Foto Kegiatan">Foto Kegiatan</option>
+                <option value="Peraturan Desa">Peraturan Desa</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>TANGGAL ARSIP</label>
+              <input type="date" name="tanggalArsip" required>
+            </div>
+            <div class="form-group">
+              <label>STATUS ARSIP</label>
+              <select name="statusArsip" required>
+                <option value="Aktif">Aktif</option>
+                <option value="Inaktif">Inaktif</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>MASA RETENSI (TAHUN)</label>
+              <input type="number" name="masaRetensi" value="5">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 15px;">
+            <label>KETERANGAN</label>
+            <textarea name="keterangan" rows="3"></textarea>
+          </div>
+          <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+            <button type="button" class="btn-reset" onclick="closeEditModal()" style="width: auto; padding: 10px 30px; margin: 0;">Batal</button>
+            <button type="submit" class="btn-primary" style="width: auto; padding: 10px 40px; margin: 0;">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+      <div style="border: 4px solid var(--accent-1); border-top: 4px solid transparent; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
+    </div>
+
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+
+    <?!= include('js'); ?>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!-- View: Penyusutan Arsip -->
+<div id="retentionView" class="hidden data-container animate-fade">
+  <div style="margin-bottom: 30px;">
+    <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Retensi & Penyusutan Arsip</h2>
+    <p style="opacity: 0.8; font-size: 0.95rem;">Kelola masa retensi dan penyusutan arsip desa secara terjadwal</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); gap: 20px;">
+    <div class="stat-mini-card">
+      <div class="stat-info">
+        <h4>Total Arsip</h4>
+        <p id="statTotal">0</p>
+      </div>
+      <div style="font-size: 1.8rem; background: #eff6ff; padding: 12px; border-radius: 12px; color: #3b82f6;">📁</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-info">
+        <h4>Arsip Aktif</h4>
+        <p id="statAktif">0</p>
+      </div>
+      <div style="font-size: 1.8rem; background: #f0fdf4; padding: 12px; border-radius: 12px; color: #22c55e;">✅</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-info">
+        <h4>Arsip Inaktif</h4>
+        <p id="statInaktif">0</p>
+      </div>
+      <div style="font-size: 1.8rem; background: #f8fafc; padding: 12px; border-radius: 12px; color: #64748b;">📂</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-info">
+        <h4>Akan Berakhir</h4>
+        <p id="statWarning">0</p>
+      </div>
+      <div style="font-size: 1.8rem; background: #fffbeb; padding: 12px; border-radius: 12px; color: #f59e0b;">🕒</div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-info">
+        <h4>Kadaluwarsa</h4>
+        <p id="statDanger">0</p>
+      </div>
+      <div style="font-size: 1.8rem; background: #fef2f2; padding: 12px; border-radius: 12px; color: #ef4444;">⚠️</div>
+    </div>
+  </div>
+
+  <!-- Alert Section -->
+  <div id="retentionAlert" class="alert-warning hidden" style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e; margin-top: 30px; margin-bottom: 30px;">
+    <span style="font-size: 1.2rem;">🔔</span>
+    <span id="alertText">Perhatian! Ada arsip yang akan mencapai masa retensi dalam waktu dekat.</span>
+  </div>
+
+  <div style="margin-top: 40px; margin-bottom: 20px;">
+    <h3 style="font-size: 1.2rem; color: var(--white); font-weight: 600; display: flex; align-items: center; gap: 10px;">
+      <span style="width: 30px; height: 2px; background: var(--accent-1);"></span>
+      Semua Arsip & Status Retensi
+    </h3>
+  </div>
+
+  <div id="retentionList" style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+    <!-- Item will be rendered here via JS -->
+  </div>
+</div>

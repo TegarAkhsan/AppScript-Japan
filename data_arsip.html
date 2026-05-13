@@ -1,0 +1,64 @@
+<!-- View: Data Arsip -->
+<div id="dataView" class="hidden data-container animate-fade">
+  <div style="margin-bottom: 30px;">
+    <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Data Arsip</h2>
+    <p style="opacity: 0.8; font-size: 0.95rem;">Kelola dan lihat semua data arsip desa yang tersimpan dalam sistem</p>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="white-card" style="max-width: 100%; text-align: left; padding: 25px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; align-items: flex-end;">
+      <div>
+        <label class="form-label" style="margin-top: 0; margin-bottom: 5px;">Pencarian</label>
+        <div class="search-wrapper">
+          <span>🔍</span>
+          <input type="text" id="searchArsip" placeholder="Cari judul atau nomor surat..." style="margin: 0; background: var(--gray-50);" onkeyup="filterTable()">
+        </div>
+      </div>
+      <div>
+        <label class="form-label" style="margin-top: 0; margin-bottom: 5px;">Jenis Surat</label>
+        <select id="filterJenis" style="margin: 0; background: var(--gray-50);" onchange="filterTable()">
+          <option value="">Semua Jenis</option>
+          <option>Surat Keputusan</option>
+          <option>Surat Keterangan</option>
+          <option>Surat Undangan</option>
+          <option>Berita Acara</option>
+          <option>Surat Pengantar</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" style="margin-top: 0; margin-bottom: 5px;">Status Arsip</label>
+        <select id="filterStatus" style="margin: 0; background: var(--gray-50);" onchange="filterTable()">
+          <option value="">Semua Status</option>
+          <option>Aktif</option>
+          <option>Inaktif</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-info" style="border-top: 1px solid var(--gray-100); margin-top: 20px; padding-top: 15px;">
+      <span style="font-size: 1.1rem;">📊</span>
+      <span id="resultCount" style="font-weight: 500; color: var(--gray-700);">Menampilkan 0 dari 0 arsip</span>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div style="overflow-x: auto; background: var(--white); border-radius: 12px;">
+    <table class="arsip-table">
+      <thead>
+        <tr>
+          <th style="width: 60px; text-align: center;">No</th>
+          <th>Judul Arsip</th>
+          <th>Nomor Surat</th>
+          <th>Jenis Surat</th>
+          <th>Tanggal</th>
+          <th>Status</th>
+          <th>Retensi</th>
+          <th style="text-align: center;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="archiveBody">
+        <!-- Data will be loaded here via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
