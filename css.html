@@ -441,14 +441,20 @@
   }
 
   .btn-reset {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--gray-200);
+    color: var(--gray-700);
     border: none;
     padding: 12px 30px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     margin-left: 10px;
+    transition: 0.3s;
+  }
+
+  .btn-reset:hover {
+    background: var(--gray-300);
+    transform: translateY(-2px);
   }
 
   /* Table & Action Icons */

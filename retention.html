@@ -51,10 +51,32 @@
   </div>
 
   <div style="margin-top: 40px; margin-bottom: 20px;">
-    <h3 style="font-size: 1.2rem; color: var(--white); font-weight: 600; display: flex; align-items: center; gap: 10px;">
+    <h3 style="font-size: 1.2rem; color: var(--white); font-weight: 600; display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
       <span style="width: 30px; height: 2px; background: var(--accent-1);"></span>
       Semua Arsip & Status Retensi
     </h3>
+    
+    <!-- Filter Retention -->
+    <div class="white-card" style="max-width: 100%; text-align: left; padding: 20px; margin-bottom: 25px;">
+      <div style="display: grid; grid-template-columns: 2fr 1.5fr; gap: 20px;">
+        <div>
+          <label class="form-label" style="margin-top: 0; margin-bottom: 5px;">Cari Arsip</label>
+          <div class="search-wrapper">
+            <span>🔍</span>
+            <input type="text" id="searchRetention" placeholder="Cari judul atau nomor surat..." style="margin: 0; background: var(--gray-50);" onkeyup="filterRetention()">
+          </div>
+        </div>
+        <div>
+          <label class="form-label" style="margin-top: 0; margin-bottom: 5px;">Filter Status Retensi</label>
+          <select id="filterRetentionStatus" style="margin: 0; background: var(--gray-50);" onchange="filterRetention()">
+            <option value="">Semua Status Retensi</option>
+            <option value="Aman">🟢 Aman</option>
+            <option value="Akan Berakhir">🟡 Akan Berakhir</option>
+            <option value="Kadaluwarsa">🔴 Kadaluwarsa</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="retentionList" style="display: grid; grid-template-columns: 1fr; gap: 15px;">

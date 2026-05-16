@@ -127,7 +127,13 @@
   function submitArchive() {
     const form = document.getElementById('uploadForm');
     const fileInput = document.getElementById('fileUpload');
-    const file = fileInput.files[0];
+    const cameraInput = document.getElementById('cameraInput');
+    const file = fileInput.files[0] || cameraInput.files[0];
+
+    if (file && file.size > 20 * 1024 * 1024) {
+      showAlert('File Terlalu Besar', 'Maksimal ukuran file adalah 20MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB', 'warning');
+      return;
+    }
 
     const formData = {
       nomorSurat: form.nomorSurat.value,
@@ -422,14 +428,52 @@
     renderTable(filtered);
   }
 
+  function filterRetention() {
+    const search = document.getElementById('searchRetention').value.toLowerCase();
+    const status = document.getElementById('filterRetentionStatus').value;
+    const today = new Date();
+
+    const filtered = allArchives.filter(item => {
+      const matchSearch = item.judul.toLowerCase().includes(search) || item.nomorsurat.toLowerCase().includes(search);
+      
+      // Calculate status for filtering
+      let startDate = new Date(item.tanggal);
+      if (isNaN(startDate.getTime())) startDate = new Date();
+      const retentionYears = parseInt(item.masaretensi) || 5;
+      const expireDate = new Date(startDate);
+      expireDate.setFullYear(expireDate.getFullYear() + retentionYears);
+      const diffTime = expireDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      let currentStatus = "Aman";
+      if (diffDays <= 0) currentStatus = "Kadaluwarsa";
+      else if (diffDays <= 90) currentStatus = "Akan Berakhir";
+
+      const matchStatus = status === "" || currentStatus === status;
+      return matchSearch && matchStatus;
+    });
+
+    renderRetentionList(filtered);
+  }
+
   function toggleLoader(show) {
     document.getElementById('loader').classList.toggle('hidden', !show);
   }
 
-  function updateFileName(input) {
+  function updateFileName(input, isCamera = false) {
     const fileNameDisplay = document.getElementById('fileName');
+    
+    // If one input is used, clear the other
+    if (isCamera) {
+      document.getElementById('fileUpload').value = "";
+    } else {
+      document.getElementById('cameraInput').value = "";
+    }
+
     if (input.files && input.files[0]) {
-      fileNameDisplay.innerText = "📄 " + input.files[0].name;
+      const file = input.files[0];
+      const prefix = isCamera ? "📸 " : "📄 ";
+      fileNameDisplay.innerHTML = `${prefix} ${file.name} <br> <small>${(file.size / (1024 * 1024)).toFixed(2)} MB</small>`;
       fileNameDisplay.style.display = 'block';
     } else {
       fileNameDisplay.innerText = "";
