@@ -3,6 +3,81 @@
   let allArchives = [];
   let sessionTimer;
   const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 Minutes
+  let isFetching = false;
+  let pollingInterval;
+
+  function setButtonLoading(buttonEl, isLoading, loadingText = "Loading...") {
+    if (!buttonEl) return;
+    if (isLoading) {
+      buttonEl.disabled = true;
+      buttonEl.dataset.originalHtml = buttonEl.innerHTML;
+      buttonEl.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> ${loadingText}`;
+      buttonEl.style.opacity = '0.7';
+      buttonEl.style.pointerEvents = 'none';
+    } else {
+      buttonEl.disabled = false;
+      buttonEl.innerHTML = buttonEl.dataset.originalHtml || buttonEl.innerHTML;
+      buttonEl.style.opacity = '1';
+      buttonEl.style.pointerEvents = 'auto';
+    }
+  }
+
+  function startRealtimeUpdates() {
+    stopRealtimeUpdates();
+    pollingInterval = setInterval(() => {
+      if (currentUser && !isFetching) {
+        fetchRealtimeData();
+      }
+    }, 15000); 
+  }
+
+  function stopRealtimeUpdates() {
+    if (pollingInterval) clearInterval(pollingInterval);
+  }
+
+  function fetchRealtimeData() {
+    isFetching = true;
+    google.script.run
+      .withSuccessHandler(jsonString => {
+        isFetching = false;
+        try {
+          const data = JSON.parse(jsonString);
+          const isEditing = !document.getElementById('editModal').classList.contains('hidden');
+          if (!isEditing) {
+            allArchives = data;
+            renderTable(data);
+            renderRetentionList(data);
+          }
+        } catch (e) {
+          console.error("Gagal parse realtime data: " + e.message);
+        }
+      })
+      .withFailureHandler(err => {
+        isFetching = false;
+        console.error("Gagal realtime update: " + err);
+      })
+      .getArchives();
+  }
+
+  function checkSavedSession() {
+    const savedUser = localStorage.getItem('sipadja_user');
+    const lastActive = localStorage.getItem('sipadja_session_time');
+    
+    if (savedUser && lastActive) {
+      const now = new Date().getTime();
+      const elapsed = now - parseInt(lastActive);
+      
+      if (elapsed < INACTIVITY_LIMIT) {
+        currentUser = savedUser;
+        localStorage.setItem('sipadja_session_time', now.toString());
+        showView('data');
+        startRealtimeUpdates();
+        return true;
+      }
+    }
+    logout();
+    return false;
+  }
 
   function showView(viewId) {
     const sections = ['landingView', 'loginSection', 'adminLayout'];
@@ -75,7 +150,10 @@
   }
 
   function resetSessionTimer() {
-    if (currentUser) startSessionTimer();
+    if (currentUser) {
+      localStorage.setItem('sipadja_session_time', new Date().getTime().toString());
+      startSessionTimer();
+    }
   }
 
   // Listeners for inactivity
@@ -83,13 +161,13 @@
     document.addEventListener(evt, resetSessionTimer, true);
   });
 
-  function quickLogin() {
+  function quickLogin(buttonEl) {
     document.getElementById('username').value = 'admin';
     document.getElementById('password').value = 'desa123';
-    handleLogin();
+    handleLogin(buttonEl);
   }
 
-  function handleLogin() {
+  function handleLogin(buttonEl) {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
     
@@ -98,19 +176,25 @@
       return;
     }
 
+    setButtonLoading(buttonEl, true, "Logging in...");
     toggleLoader(true);
     google.script.run
       .withSuccessHandler(res => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         if (res.success) {
           currentUser = res.user;
+          localStorage.setItem('sipadja_user', res.user);
+          localStorage.setItem('sipadja_session_time', new Date().getTime().toString());
           showView('data');
+          startRealtimeUpdates();
           showAlert('Berhasil', 'Selamat datang kembali, ' + user + '!', 'success');
         } else {
           document.getElementById('loginError').classList.remove('hidden');
         }
       })
       .withFailureHandler(err => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         showAlert('Error Login', 'Terjadi kesalahan saat mencoba login: ' + err, 'error');
       })
@@ -119,11 +203,14 @@
 
   function logout() {
     currentUser = null;
+    localStorage.removeItem('sipadja_user');
+    localStorage.removeItem('sipadja_session_time');
     stopSessionTimer();
+    stopRealtimeUpdates();
     showView('landing');
   }
 
-  function submitArchive() {
+  function submitArchive(buttonEl) {
     const form = document.getElementById('uploadForm');
     const fileInput = document.getElementById('fileUpload');
     const cameraInput = document.getElementById('cameraInput');
@@ -152,23 +239,25 @@
       return;
     }
 
+    setButtonLoading(buttonEl, true, "Menyimpan...");
     toggleLoader(true);
 
     if (file) {
       const reader = new FileReader();
       reader.onload = function(e) {
         formData.fileData = e.target.result;
-        sendToServer(formData);
+        sendToServer(formData, buttonEl);
       };
       reader.readAsDataURL(file);
     } else {
-      sendToServer(formData);
+      sendToServer(formData, buttonEl);
     }
   }
 
-  function sendToServer(formData) {
+  function sendToServer(formData, buttonEl) {
     google.script.run
       .withSuccessHandler(res => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         showAlert('Berhasil', 'Data arsip dan dokumen berhasil disimpan!', 'success');
         document.getElementById('uploadForm').reset();
@@ -176,6 +265,7 @@
         showView('data');
       })
       .withFailureHandler(err => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         showAlert('Gagal Simpan', 'Gagal menyimpan data: ' + err, 'error');
       })
@@ -509,15 +599,18 @@
     }
   }
 
-  function createDummy() {
+  function createDummy(buttonEl) {
+    setButtonLoading(buttonEl, true, "Generating...");
     toggleLoader(true);
     google.script.run
       .withSuccessHandler(res => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         showAlert('Dummy Berhasil', res.count + ' data dummy berhasil ditambahkan ke Spreadsheet!', 'success');
         loadArchives();
       })
       .withFailureHandler(err => {
+        setButtonLoading(buttonEl, false);
         toggleLoader(false);
         showAlert('Gagal', 'Terjadi kesalahan: ' + err, 'error');
       })
@@ -526,6 +619,9 @@
 
   // Initialize
   window.onload = () => {
-    showView('landing');
+    const sessionActive = checkSavedSession();
+    if (!sessionActive) {
+      showView('landing');
+    }
   };
 </script>

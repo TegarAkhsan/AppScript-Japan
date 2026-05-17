@@ -6,7 +6,7 @@
     <div id="loginError" style="color: #ff6b6b; margin-bottom: 15px; font-size: 0.9rem;" class="hidden">Username atau Password salah!</div>
     <input type="text" id="username" placeholder="Username">
     <input type="password" id="password" placeholder="Password">
-    <button class="btn-primary" onclick="handleLogin()">Login</button>
+    <button class="btn-primary" onclick="handleLogin(this)">Login</button>
     
     <div style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0.5;">
       <div style="height: 1px; background: white; flex: 1;"></div>
@@ -14,6 +14,6 @@
       <div style="height: 1px; background: white; flex: 1;"></div>
     </div>
     
-    <button class="btn-admin-quick" onclick="quickLogin()">Masuk sebagai Admin (Demo)</button>
+    <button class="btn-admin-quick" onclick="quickLogin(this)">Masuk sebagai Admin (Demo)</button>
   </div>
 </div>
