@@ -1,13 +1,39 @@
 function doGet() {
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
-    .setTitle('E-Arsip Desa Japanan')
+    .setTitle('SIPADJA - Desa Japanan')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+// Fungsi khusus untuk memancing otorisasi Google Drive (Write Permission)
+function authorizeDrive() {
+  const file = DriveApp.createFile("temp_auth_trigger.txt", "trigger");
+  file.setTrashed(true); // Hapus langsung agar tidak nyampah
+  Logger.log("Selesai memanggil DriveApp (Write Permission)");
+}
+
+// Fungsi untuk mengetes akses folder spesifik
+function testFolderAccess() {
+  try {
+    Logger.log("Mencoba mengambil folder ID: " + FOLDER_ID);
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+    Logger.log("Folder berhasil diambil: " + folder.getName());
+    
+    Logger.log("Mencoba membuat file dummy di folder tersebut...");
+    const file = folder.createFile("test_akses.txt", "Tes Akses");
+    Logger.log("File dummy berhasil dibuat! URL: " + file.getUrl());
+    
+    Logger.log("Menghapus file dummy...");
+    file.setTrashed(true);
+    Logger.log("Semua tes berhasil! Akun kamu punya akses penuh ke folder ini.");
+  } catch (e) {
+    Logger.log("TES GAGAL! Error detail: " + e.toString());
+  }
 }
 
 // Configuration
@@ -42,7 +68,11 @@ function saveArchive(formData) {
       const bytes = Utilities.base64Decode(formData.fileData.split(",")[1]);
       const blob = Utilities.newBlob(bytes, contentType, formData.fileName);
       const file = folder.createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      try {
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (sharingError) {
+        Logger.log("Gagal mengatur hak akses publik (kemungkinan diblokir kebijakan organisasi): " + sharingError.toString());
+      }
       fileUrl = file.getUrl();
     }
 
