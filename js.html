@@ -79,12 +79,43 @@
     return false;
   }
 
+  function toggleSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && sidebar.classList.contains('open')) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  }
+
+  function openSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && overlay) {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+    }
+  }
+
+  function closeSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && overlay) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    }
+  }
+
   function showView(viewId) {
     const sections = ['landingView', 'loginSection', 'adminLayout'];
     sections.forEach(s => document.getElementById(s).classList.add('hidden'));
 
     const adminViews = ['uploadView', 'dataView', 'retentionView'];
     adminViews.forEach(v => document.getElementById(v).classList.add('hidden'));
+
+    // Auto-close sidebar on view change
+    closeSidebar();
 
     if (viewId === 'login') {
       document.getElementById('loginSection').classList.remove('hidden');
