@@ -846,4 +846,150 @@
       border-radius: 16px !important;
     }
   }
+
+  /* Footer Styling */
+  .main-footer {
+    background: rgba(13, 33, 55, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 60px 40px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .footer-left {
+    flex: 1.2;
+    text-align: left;
+  }
+
+  .footer-right {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 20px;
+  }
+
+  .footer-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    color: white;
+  }
+
+  .footer-subtitle {
+    font-size: 1.3rem;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-bottom: 16px;
+    color: var(--accent-1);
+  }
+
+  .footer-address {
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  .footer-logos {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .footer-logo-img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+  }
+
+  .footer-logo-img:hover {
+    transform: translateY(-5px);
+  }
+
+  .footer-credits {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .credit-main {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+  }
+
+  .credit-sub {
+    font-weight: 300;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  /* Responsive details for Footer */
+  @media (max-width: 992px) {
+    .main-footer {
+      padding: 40px 20px;
+    }
+    
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 35px;
+    }
+
+    .footer-left {
+      text-align: center;
+      max-width: 100%;
+    }
+
+    .footer-right {
+      align-items: center;
+      text-align: center;
+      max-width: 100%;
+    }
+    
+    .footer-logos {
+      justify-content: center;
+      gap: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-title {
+      font-size: 1.8rem;
+    }
+    
+    .footer-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .footer-logo-img {
+      height: 45px;
+    }
+    
+    .credit-main {
+      font-size: 0.85rem;
+    }
+    
+    .credit-sub {
+      font-size: 0.75rem;
+    }
+  }
 </style>
