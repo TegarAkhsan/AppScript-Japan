@@ -1,0 +1,72 @@
+<!-- View: Data Petugas -->
+<div id="petugasView" class="hidden data-container animate-fade">
+  <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>
+      <h2 style="font-size: 1.8rem; margin-bottom: 5px; color: var(--gray-800);">Data Petugas</h2>
+      <p style="opacity: 0.8; font-size: 0.95rem; color: var(--gray-700);">Daftar administrator dan petugas pengelola arsip digital</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--gray-700); background: var(--gray-100); padding: 8px 15px; border-radius: 8px;">
+      <i class="fas fa-database"></i> <span>Master Data / Petugas</span>
+    </div>
+  </div>
+
+  <div class="white-card" style="padding: 30px; border-radius: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-800); margin: 0;">Petugas Aktif</h3>
+      <button class="btn-primary" style="width: auto; padding: 10px 20px; font-size: 0.85rem; margin: 0; background: var(--primary);" onclick="showAlert('Info', 'Fitur menambah petugas baru dinonaktifkan sementara.', 'warning')">
+        <i class="fas fa-plus" style="margin-right: 5px;"></i> Tambah Petugas
+      </button>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="arsip-table">
+        <thead>
+          <tr>
+            <th style="width: 60px; text-align: center;">No</th>
+            <th>Nama Lengkap</th>
+            <th>Username</th>
+            <th>Jabatan</th>
+            <th style="text-align: center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">1</td>
+            <td><strong>Administrator Sistem</strong></td>
+            <td><code>admin</code></td>
+            <td>Kepala Urusan Umum & Tata Usaha</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">2</td>
+            <td><strong>Ahmad Subarjo</strong></td>
+            <td><code>ahmad_sipadja</code></td>
+            <td>Sekretaris Desa Japanan</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">3</td>
+            <td><strong>Siti Aminah</strong></td>
+            <td><code>siti_sipadja</code></td>
+            <td>Kasi Pemerintahan Desa</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">4</td>
+            <td><strong>Roni Wijaya</strong></td>
+            <td><code>roni_sipadja</code></td>
+            <td>Kaur Perencanaan</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">5</td>
+            <td><strong>Diana Putri</strong></td>
+            <td><code>diana_sipadja</code></td>
+            <td>Staf Pelayanan Umum</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

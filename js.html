@@ -47,6 +47,7 @@
             allArchives = data;
             renderTable(data);
             renderRetentionList(data);
+            updateDashboardStats(data);
           }
         } catch (e) {
           console.error("Gagal parse realtime data: " + e.message);
@@ -70,7 +71,7 @@
       if (elapsed < INACTIVITY_LIMIT) {
         currentUser = savedUser;
         localStorage.setItem('sipadja_session_time', now.toString());
-        showView('data');
+        showView('dashboard');
         startRealtimeUpdates();
         return true;
       }
@@ -111,30 +112,128 @@
     const sections = ['landingView', 'loginSection', 'adminLayout'];
     sections.forEach(s => document.getElementById(s).classList.add('hidden'));
 
-    const adminViews = ['uploadView', 'dataView', 'retentionView'];
-    adminViews.forEach(v => document.getElementById(v).classList.add('hidden'));
+    const adminViews = ['uploadView', 'dataView', 'retentionView', 'dashboardView', 'kategoriView', 'petugasView'];
+    adminViews.forEach(v => {
+      const el = document.getElementById(v);
+      if (el) el.classList.add('hidden');
+    });
 
-    // Auto-close sidebar on view change
+    // Auto-close sidebar on view change (for mobile)
     closeSidebar();
 
     if (viewId === 'login') {
       document.getElementById('loginSection').classList.remove('hidden');
       stopSessionTimer();
-    } else if (['data', 'upload', 'retention'].includes(viewId)) {
+    } else if (['data', 'upload', 'retention', 'dashboard', 'kategori', 'petugas'].includes(viewId)) {
       document.getElementById('adminLayout').classList.remove('hidden');
-      document.getElementById(viewId + 'View').classList.remove('hidden');
       
-      document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      const viewEl = document.getElementById(viewId + 'View');
+      if (viewEl) viewEl.classList.remove('hidden');
+      
+      document.querySelectorAll('.sidebar-item, .sidebar-subitem').forEach(el => el.classList.remove('active'));
+      
       const activeMenu = document.getElementById('menu-' + viewId);
-      if (activeMenu) activeMenu.classList.add('active');
+      if (activeMenu) {
+        activeMenu.classList.add('active');
+        
+        // If it's a subitem, ensure the parent dropdown is open
+        if (activeMenu.classList.contains('sidebar-subitem')) {
+          const parentDropdownContainer = activeMenu.closest('.dropdown-container');
+          if (parentDropdownContainer) {
+            parentDropdownContainer.classList.remove('hidden');
+            const parentToggle = parentDropdownContainer.previousElementSibling;
+            if (parentToggle && parentToggle.classList.contains('dropdown-toggle')) {
+              parentToggle.classList.add('active-dropdown');
+            }
+          }
+        }
+      }
 
-      if (['data', 'retention'].includes(viewId)) loadArchives();
+      // Update breadcrumb text in top navbar
+      updateBreadcrumb(viewId);
+
+      if (['data', 'retention', 'dashboard'].includes(viewId)) loadArchives();
       
       startSessionTimer(); // Start/Reset timer when in admin area
     } else {
       document.getElementById('landingView').classList.remove('hidden');
       stopSessionTimer();
     }
+  }
+
+  // --- Breadcrumb Update Logic ---
+  function updateBreadcrumb(viewId) {
+    const breadcrumbText = document.querySelector('.navbar-breadcrumb span');
+    if (!breadcrumbText) return;
+    
+    let label = 'Beranda';
+    if (viewId === 'dashboard') label = 'Dashboard';
+    else if (viewId === 'kategori') label = 'Kategori Surat';
+    else if (viewId === 'petugas') label = 'Data Petugas';
+    else if (viewId === 'data') label = 'Data Arsip';
+    else if (viewId === 'upload') label = 'Upload Arsip';
+    else if (viewId === 'retention') label = 'Retensi Arsip';
+    
+    breadcrumbText.innerText = label;
+  }
+
+  // --- Sidebar Dropdown Animation Toggles ---
+  function toggleDropdown(menuId) {
+    const container = document.getElementById(menuId);
+    if (!container) return;
+    
+    const isHidden = container.classList.contains('hidden');
+    const toggleBtn = container.previousElementSibling;
+    
+    if (isHidden) {
+      container.classList.remove('hidden');
+      if (toggleBtn) toggleBtn.classList.add('active-dropdown');
+    } else {
+      container.classList.add('hidden');
+      if (toggleBtn) toggleBtn.classList.remove('active-dropdown');
+    }
+  }
+
+  // --- Header Profile Menu Toggle ---
+  function toggleProfileMenu(event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('profileDropdownMenu');
+    if (menu) {
+      menu.classList.toggle('hidden');
+    }
+  }
+
+  // Close profile dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('profileDropdownMenu');
+    const trigger = document.querySelector('.profile-dropdown-trigger');
+    if (menu && !menu.classList.contains('hidden')) {
+      if (!menu.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+        menu.classList.add('hidden');
+      }
+    }
+  });
+
+  // --- Dashboard Dynamic Statistics Calculator ---
+  function updateDashboardStats(data) {
+    if (!data || !Array.isArray(data)) return;
+    
+    // Count archives by status (case-insensitive for safety)
+    const aktifCount = data.filter(item => (item.status || '').toLowerCase() === 'aktif').length;
+    const inaktifCount = data.filter(item => (item.status || '').toLowerCase() === 'inaktif').length;
+    const statisCount = data.filter(item => {
+      const s = (item.status || '').toLowerCase();
+      return s === 'statis' || s === 'arsip statis';
+    }).length;
+    
+    // Update DOM elements if present
+    const elAktif = document.getElementById('dashboardStatAktif');
+    const elInaktif = document.getElementById('dashboardStatInaktif');
+    const elStatis = document.getElementById('dashboardStatStatis');
+    
+    if (elAktif) elAktif.innerText = aktifCount;
+    if (elInaktif) elInaktif.innerText = inaktifCount;
+    if (elStatis) elStatis.innerText = statisCount;
   }
 
   // --- Modal Logic ---
@@ -217,7 +316,7 @@
           currentUser = res.user;
           localStorage.setItem('sipadja_user', res.user);
           localStorage.setItem('sipadja_session_time', new Date().getTime().toString());
-          showView('data');
+          showView('dashboard');
           startRealtimeUpdates();
           showAlert('Berhasil', 'Selamat datang kembali, ' + user + '!', 'success');
         } else {
@@ -293,7 +392,7 @@
         showAlert('Berhasil', 'Data arsip dan dokumen berhasil disimpan!', 'success');
         document.getElementById('uploadForm').reset();
         document.getElementById('fileName').style.display = 'none';
-        showView('data');
+        showView('dashboard');
       })
       .withFailureHandler(err => {
         setButtonLoading(buttonEl, false);
@@ -318,6 +417,7 @@
           allArchives = data;
           renderTable(data);
           renderRetentionList(data);
+          updateDashboardStats(data);
         } catch (e) {
           showAlert('Error Parse', 'Gagal memproses data: ' + e.message, 'error');
         }

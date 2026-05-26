@@ -1,0 +1,91 @@
+<!-- View: Admin Dashboard -->
+<div id="dashboardView" class="hidden data-container animate-fade">
+  <!-- Title and Header Area -->
+  <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>
+      <h2 style="font-size: 1.8rem; margin-bottom: 5px; color: var(--gray-800);">Dashboard</h2>
+      <p style="opacity: 0.8; font-size: 0.95rem; color: var(--gray-700);">Ringkasan statistik dan aktivitas sistem arsip desa</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--gray-700); background: var(--gray-100); padding: 8px 15px; border-radius: 8px;">
+      <i class="fas fa-home"></i> <span>/ Dashboard</span>
+    </div>
+  </div>
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" style="background: var(--white); border-left: 5px solid var(--primary-light); border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px;">
+    <h3 style="font-size: 1.5rem; color: var(--gray-800); font-weight: 700; margin: 0;">
+      Selamat Datang di <span style="color: var(--primary); font-weight: 800;">SIPADJA</span>
+    </h3>
+    <p style="color: var(--gray-700); font-size: 0.95rem; margin: 0; line-height: 1.5;">
+      Membantu proses pengelolaan arsip digital pada Kasi Pemerintahan Desa Japanan secara lebih mudah, terstruktur, dan efisien.
+    </p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="dashboard-stats-grid">
+    <!-- Card 1: Surat Aktif -->
+    <div class="dashboard-stat-card card-blue" onclick="showView('data')">
+      <div class="card-body">
+        <div class="card-title">SURAT AKTIF</div>
+        <div class="card-value" id="dashboardStatAktif">0</div>
+        <div class="card-icon-watermark">
+          <i class="fas fa-folder-open"></i>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>Lihat Data</span> <i class="fas fa-arrow-right"></i>
+      </div>
+    </div>
+
+    <!-- Card 2: Surat Inaktif -->
+    <div class="dashboard-stat-card card-amber" onclick="showView('data')">
+      <div class="card-body">
+        <div class="card-title">SURAT INAKTIF</div>
+        <div class="card-value" id="dashboardStatInaktif">0</div>
+        <div class="card-icon-watermark">
+          <i class="fas fa-folder"></i>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>Lihat Data</span> <i class="fas fa-arrow-right"></i>
+      </div>
+    </div>
+
+    <!-- Card 3: Surat Statis -->
+    <div class="dashboard-stat-card card-green" onclick="showView('data')">
+      <div class="card-body">
+        <div class="card-title">SURAT STATIS</div>
+        <div class="card-value" id="dashboardStatStatis">0</div>
+        <div class="card-icon-watermark">
+          <i class="fas fa-box-archive"></i>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>Lihat Data</span> <i class="fas fa-arrow-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brief Guide Section -->
+  <div class="white-card" style="padding: 30px; margin-bottom: 40px; border-radius: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+    <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--gray-800); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.25rem;"></i> Panduan Singkat Sistem
+    </h4>
+    <ol style="color: var(--gray-700); font-size: 0.95rem; line-height: 1.8; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; list-style-type: decimal;">
+      <li>Sistem Arsip Surat Digital dirancang untuk memudahkan manajemen dokumen instansi. Gunakan menu di <strong>Sidebar kiri</strong> untuk bernavigasi.</li>
+      <li>Gunakan menu <strong>Upload Arsip</strong> untuk menambahkan dan menyimpan arsip digital baru ke dalam sistem.</li>
+      <li>Gunakan menu <strong>Data Arsip</strong> untuk melihat, mencari, mengedit, mengunduh, dan mengelola seluruh data arsip yang tersimpan.</li>
+      <li>Gunakan menu <strong>Retensi Arsip</strong> untuk memantau masa retensi arsip, melihat status arsip aktif maupun inaktif, serta melakukan proses penyusutan arsip.</li>
+    </ol>
+  </div>
+
+  <!-- Custom Dashboard Footer -->
+  <div style="border-top: 1px solid var(--gray-200); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; font-size: 0.85rem; color: var(--gray-700);">
+    <div>
+      Arsip Surat Digital &copy; 2026 - <span style="font-weight: 600;">Sistem Informasi Manajemen Surat</span>
+    </div>
+    <div style="font-weight: 600;">
+      Versi 1.0.0
+    </div>
+  </div>
+</div>

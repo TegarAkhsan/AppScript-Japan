@@ -48,13 +48,19 @@
             Sistem Informasi Pengarsipan Desa Japanan
           </span>
         </div>
+
         <nav class="sidebar-menu">
+          <a class="sidebar-item" id="menu-dashboard" onclick="showView('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
           <a class="sidebar-item" id="menu-data" onclick="showView('data')"><i class="fas fa-database"></i> Data Arsip</a>
           <a class="sidebar-item" id="menu-upload" onclick="showView('upload')"><i class="fas fa-file-upload"></i> Upload Arsip</a>
-          <a class="sidebar-item" id="menu-retention" onclick="showView('retention')"><i class="fas fa-hourglass-half"></i> Penyusutan</a>
+          <a class="sidebar-item" id="menu-retention" onclick="showView('retention')"><i class="fas fa-hourglass-half"></i> Retensi Arsip</a>
         </nav>
-        <div class="sidebar-footer">
-          <a class="sidebar-item" onclick="logout()" style="color: #ffffff; background: #ef4444; margin: 10px; border-radius: 8px; justify-content: center; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+        <div class="sidebar-footer" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.15); padding: 15px 10px 0 10px;">
+          <div style="font-size: 0.65rem; line-height: 1.5; opacity: 0.8; text-align: left; color: rgba(255,255,255,0.85); border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 15px; margin-bottom: 15px;">
+            <strong style="font-weight: 600; display: block; margin-bottom: 2px; color: #ffffff;">Dikembangkan oleh Tim SIPADJA 2026</strong>
+            Prodi Sarjana Terapan Administrasi Negara (D4) Angkatan 2024, Fakultas Vokasi, Universitas Negeri Surabaya
+          </div>
+          <a class="sidebar-item" onclick="logout()" style="color: #ffffff; background: #ef4444; margin: 0 0 15px 0; border-radius: 8px; justify-content: center; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
             <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Keluar Sesi
           </a>
         </div>
@@ -72,9 +78,12 @@
           </div>
         </div>
 
+        <?!= include('dashboard_admin'); ?>
+        <?!= include('kategori_admin'); ?>
         <?!= include('data_arsip'); ?>
         <?!= include('upload'); ?>
         <?!= include('retention'); ?>
+        <?!= include('petugas_admin'); ?>
       </main>
     </div>
 

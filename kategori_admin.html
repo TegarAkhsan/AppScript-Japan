@@ -1,0 +1,91 @@
+<!-- View: Kategori Surat -->
+<div id="kategoriView" class="hidden data-container animate-fade">
+  <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>
+      <h2 style="font-size: 1.8rem; margin-bottom: 5px; color: var(--gray-800);">Kategori Surat</h2>
+      <p style="opacity: 0.8; font-size: 0.95rem; color: var(--gray-700);">Daftar kategori klasifikasi arsip surat desa</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--gray-700); background: var(--gray-100); padding: 8px 15px; border-radius: 8px;">
+      <i class="fas fa-database"></i> <span>Master Data / Kategori</span>
+    </div>
+  </div>
+
+  <div class="white-card" style="padding: 30px; border-radius: 16px; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-800); margin: 0;">Kategori Aktif</h3>
+      <button class="btn-primary" style="width: auto; padding: 10px 20px; font-size: 0.85rem; margin: 0; background: var(--primary);" onclick="showAlert('Info', 'Fitur menambah kategori baru dinonaktifkan sementara.', 'warning')">
+        <i class="fas fa-plus" style="margin-right: 5px;"></i> Tambah Kategori
+      </button>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="arsip-table">
+        <thead>
+          <tr>
+            <th style="width: 60px; text-align: center;">No</th>
+            <th>Nama Kategori</th>
+            <th>Deskripsi Klasifikasi</th>
+            <th style="text-align: center;">Status</th>
+            <th style="text-align: center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">1</td>
+            <td><strong>Jual Beli Warisan</strong></td>
+            <td>Dokumen transaksi jual beli tanah dan properti warisan desa</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">2</td>
+            <td><strong>Surat Pernyataan Warisan</strong></td>
+            <td>Pernyataan ahli waris dan pembagian hak waris keluarga</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">3</td>
+            <td><strong>Sertifikat Tanah</strong></td>
+            <td>Salinan sertifikat tanah, letter C, dan batas wilayah warga</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">4</td>
+            <td><strong>Foto Kegiatan</strong></td>
+            <td>Dokumentasi visual kegiatan pemerintahan dan pembangunan desa</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">5</td>
+            <td><strong>Peraturan Desa</strong></td>
+            <td>Perkades, SK Kades, dan produk hukum pemerintahan desa</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; opacity: 0.7;">6</td>
+            <td><strong>Lainnya</strong></td>
+            <td>Kategori umum untuk arsip yang tidak masuk dalam 5 grup di atas</td>
+            <td style="text-align: center;"><span class="badge badge-aktif">Aktif</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn btn-edit" title="Edit" onclick="showAlert('Info', 'Modifikasi kategori utama dikunci.', 'warning')"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
