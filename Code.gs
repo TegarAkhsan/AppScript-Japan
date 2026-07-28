@@ -37,8 +37,8 @@ function testFolderAccess() {
 }
 
 // Configuration
-const SPREADSHEET_ID = '1_3Rv6Ek7Vv1Nt4t-rNyOj7zS1dC3sHIWeoeJ_1yZ29s'; 
-const FOLDER_ID = '1K5xbpU3urq0xXA2j0BVRg5R4PYQKjV0U';
+const SPREADSHEET_ID = '1QtHC2ntxDYG9wIJcQTczPy_jF4GoiLv2LhyLbnefEC0'; 
+const FOLDER_ID = '14Sl-B59aulZt_63inaYBninWio06unHk';
 
 function checkLogin(username, password) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -196,7 +196,7 @@ function generateDummyData() {
       status[Math.floor(Math.random() * status.length)], // Status
       Math.floor(Math.random() * 10) + 1, // Masa Retensi (1-10 thn)
       `Keterangan otomatis untuk data dummy nomor ${i}`, // Keterangan
-      'https://drive.google.com/drive/folders/1K5xbpU3urq0xXA2j0BVRg5R4PYQKjV0U' // Dummy Link
+      'https://drive.google.com/drive/folders/14Sl-B59aulZt_63inaYBninWio06unHk' // Dummy Link
     ]);
   }
   
