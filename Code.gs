@@ -40,6 +40,15 @@ function testFolderAccess() {
 const SPREADSHEET_ID = '1QtHC2ntxDYG9wIJcQTczPy_jF4GoiLv2LhyLbnefEC0'; 
 const FOLDER_ID = '14Sl-B59aulZt_63inaYBninWio06unHk';
 
+// Fungsi untuk inisialisasi awal Spreadsheet jika kosongan
+function setupDatabase() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  createArchivesSheet(ss);
+  createUsersSheet(ss);
+  Logger.log("Database spreadsheet berhasil di-inisialisasi!");
+  return { success: true, message: "Database spreadsheet berhasil di-inisialisasi!" };
+}
+
 function checkLogin(username, password) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName('Users') || createUsersSheet(ss);
@@ -97,11 +106,7 @@ function saveArchive(formData) {
 
 function getArchives() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName('Archives');
-  
-  if (!sheet) {
-    throw new Error('Sheet "Archives" tidak ditemukan!');
-  }
+  const sheet = ss.getSheetByName('Archives') || createArchivesSheet(ss);
   
   const data = sheet.getDataRange().getValues();
   if (data.length < 2) return JSON.stringify([]);
@@ -128,14 +133,14 @@ function getArchives() {
 
 function deleteArchive(rowNumber) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName('Archives');
+  const sheet = ss.getSheetByName('Archives') || createArchivesSheet(ss);
   sheet.deleteRow(rowNumber);
   return { success: true };
 }
 
 function updateArchive(rowNumber, formData) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName('Archives');
+  const sheet = ss.getSheetByName('Archives') || createArchivesSheet(ss);
   
   // Ambil baris yang ada untuk mempertahankan file link jika tidak diubah
   const currentRow = sheet.getRange(rowNumber, 1, 1, 10).getValues()[0];
@@ -164,11 +169,29 @@ function fixHeaders(sheet) {
 
 function createArchivesSheet(ss) {
   let sheet = ss.getSheetByName('Archives');
-  if (!sheet) sheet = ss.insertSheet('Archives');
-  const headers = ['Timestamp', 'Nomor Surat', 'Judul', 'Jenis Surat', 'Kategori', 'Tanggal', 'Status', 'Masa Retensi', 'Keterangan', 'File Link'];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  if (!sheet) {
+    sheet = ss.insertSheet('Archives');
+  }
+  if (sheet.getLastRow() === 0) {
+    const headers = ['Timestamp', 'Nomor Surat', 'Judul', 'Jenis Surat', 'Kategori', 'Tanggal', 'Status', 'Masa Retensi', 'Keterangan', 'File Link'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  }
   return sheet;
 }
+
+function createUsersSheet(ss) {
+  let sheet = ss.getSheetByName('Users');
+  if (!sheet) {
+    sheet = ss.insertSheet('Users');
+  }
+  if (sheet.getLastRow() === 0) {
+    const headers = ['Username', 'Password', 'Role'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.appendRow(['admin', 'admin123', 'Admin']);
+  }
+  return sheet;
+}
+
 function generateDummyData() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName('Archives') || createArchivesSheet(ss);
